@@ -1,0 +1,471 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if !IE]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+        <link href='https://fonts.googleapis.com/css?family=Indie+Flower' rel='stylesheet' type='text/css'>
+        <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+<style>
+    body {
+        margin: 0px;
+        padding: 0px;
+        height:100vh;
+    }
+
+    #main {
+        position: relative;
+    }
+
+    @media (max-width: 600px) {
+        #main { 
+            width: 100%;
+            height: 100vh;
+            max-height: 640px;
+            background-color: aliceblue;
+        }
+        
+        .main-text, .hidden-text {
+            text-align: center;
+            font: 22px/33px "Indie Flower", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    }
+    
+    @media (min-width: 601px) {
+        #main { 
+            margin: auto;
+            width: 480px;
+            height: 640px;
+            background-color: aliceblue;
+        }
+        
+        .main-text, .hidden-text {
+            text-align: center;
+            font: 28px/42px "Indie Flower", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+    }
+
+    .main-text, .hidden-text {            
+        padding-left: 48px;
+        padding-right: 48px;
+        position: absolute;
+        display: inline-block;
+        top: 14%;
+        left: 0;
+        color: white;
+        text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+        letter-spacing: 0.1em;                
+    }
+    
+    .hidden-text {
+        position: absolute;
+        visibility: hidden;
+        height: auto;
+        width: auto;
+    }
+          
+    .typed-cursor {
+        display: none;
+    }
+
+    .transition-image, .background-image, .permanent-background-image {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .collage-container  {
+        width: 100%;
+        height: 100%;
+        display: none;
+    }
+
+    .collage-image {
+        width: 150%;
+    }
+
+    .hidden-collage {
+        visibility: hidden;
+    }
+</style>
+<title>For my love</title>
+</head>
+<body>
+
+    <div id="main">
+        <div class="permanent-background-image"></div>
+        <div class="background-image"></div>
+        <div class="transition-image"></div>
+        <div class="collage-container"></div>
+        <div class="main-text"></div>
+        <div class="hidden-text"></div>
+        <div class="hidden-collage"></div>
+    </div>
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="typed.js"></script>
+    <script>
+
+        function preloadImages(images, callback) 
+        {
+            var loaded   = []; // here the loaded images will be contained
+            for (let i = 0; i < images.length; i++) {
+                // wrap the loop into a closure because onload is asynchronous
+                (function(src) {
+                    // construct a new image
+                    var img = new Image();
+
+                    // use the onload event of the image
+                    // you can react to errors or load aborts using 'onerror' or 'onabort'
+                    img.onload = function() {
+                        loaded.push(img);
+
+                        // call the callback once all images are loaded
+                        loaded.length === images.length && callback.call(this, loaded); 
+                    };
+
+                    // set the source
+                    img.src = src;
+                })(images[i]);
+            }
+        }
+
+        let backgroundImages = [''];
+
+        let poem = 
+        [
+            {
+                content: "Happy birthday to my one and only~",
+                type: "gif",
+                images: [
+                    {time: 200, src: "Pics/0-0.png"},
+                    {time: 200, src: "Pics/0-1.png"},
+                ],
+                loop: true
+            },
+            {
+                content: "With you my heart is never lonely",
+                type: "gif",
+                images: [
+                    {time: 500, src: "Pics/1-0.png"},
+                    {time: 200, src: "Pics/1-1.png"},
+                ],
+                loop: true
+            },
+            {
+                content: "In this I never would have guessed",
+                type: "gif",
+                images: [
+                    {time: 500, src: "Pics/2-0.png"},
+                    {time: 200, src: "Pics/2-1.png"},
+                ],
+                loop: false
+            },
+            {
+                content: "Each time you rest on my chest",
+                type: "gif",
+                images: [
+                    {time: 500, src: "Pics/3-0.png"},
+                ],
+                loop: false
+            },
+            {
+                content: "And while we'd throw the world through a loop",
+                type: "gif",
+                images: [
+                    {time: 300, src: "Pics/4-0.png"},
+                    {time: 300, src: "Pics/4-1.png"},
+                    {time: 300, src: "Pics/4-2.png"},
+                    {time: 300, src: "Pics/4-3.png"}
+                ],
+                loop: true
+            },
+            {
+                content: "I'm right beside you and the chicken coop",
+                type: "gif",
+                images: [
+                    {time: 300, src: "Pics/5-0.png"},
+                    {time: 300, src: "Pics/5-1.png"}
+                ],
+                loop: true
+            }
+        ];
+
+        let current = 0;
+        let currentGifTimer = null;
+        let currentGifImages = [];
+        let currentGifIndex = 0;
+        let currentGifLooping = false;
+        let currentGifElement = ".background-image";
+
+        let permanentCurrent = 0;
+        let permanentCurrentGifTimer = null;
+        let permanentCurrentGifImages = [];
+        let permanentCurrentGifIndex = 0;
+        let permanentCurrentGifLooping = false;
+
+        function setText(index) {
+				current = index;
+                var currentText = poem[index].content;
+                
+                $('.hidden-text').html(currentText);
+                var mainWidth = $('#main').width();
+                var width = $('.hidden-text').width();
+                
+                $('.main-text').css("left", mainWidth / 2 - width / 2 - 36);
+
+                startPage(index);
+        }
+
+        function startPage(index) {
+            var currentLine = poem[index];
+
+            if(poem[index].permanentBackgroundImages) {
+                permanentCurrentGifImages = poem[index].permanentBackgroundImages;
+            }
+
+            if(index >= 0) {            
+
+                clearTimeout(currentGifTimer);
+                clearTimeout(collageTimer);
+
+                let nextBackground = null;
+                if(index < poem.length) 
+                {
+                    if(poem[index].type == "gif" && poem[index].images) {
+                        nextBackground = poem[index].images[0];
+                    }
+                }
+                $(".background-image").css("background", "url('" + nextBackground?.src + "') no-repeat center/100%");
+
+                $('.collage-container').fadeOut(500);
+                $('.transition-image').fadeOut(500);
+                $('.background-image').fadeIn(500, () => {
+                    $('.transition-image').remove();
+                    $('.background-image').addClass("transition-image");
+                    $('.background-image').removeClass("background-image");
+                    $('.main-text').before("<div class=\"background-image\" style=\"display: none\"></div>")
+
+                    currentGifElement = ".transition-image";
+
+                    switch(currentLine.type) {
+
+                        case "gif": 
+                            startGif(currentLine.images, currentLine.loop);
+                            break;
+
+                        case "collage":
+                            let images = [];
+
+                            for(let i = 0; i < currentLine.count; ++i) 
+                            {
+                                images.push(currentLine.path + "/" + i.toString().padStart(2, '0') + ".png");
+                            }
+
+                            startCollage(images);
+                            break;
+                    }   
+                });
+            }
+        }
+
+        function startGif(images, loop) {
+            currentGifImages = images;
+            currentGifLooping = loop;
+            currentGifIndex = 0;
+            
+            clearTimeout(currentGifTimer);
+            currentGifTimer = setTimeout(nextGifImage, currentGifImages[currentGifIndex].time ?? 200)
+        }
+
+        function nextGifImage() {
+            currentGifIndex++;
+            if(currentGifLooping && currentGifIndex >= currentGifImages.length) {
+                currentGifIndex = 0;
+                currentGifTimer = setTimeout(nextGifImage, currentGifImages[currentGifIndex].time ?? 200);
+                $(currentGifElement).css("background", "url('" + currentGifImages[currentGifIndex].src + "') no-repeat center/100%");
+            } else if(!currentGifLooping && currentGifIndex >= currentGifImages.length) {
+                clearTimeout(currentGifTimer);
+                currentGifTimer = null;
+            }
+            else {
+                currentGifTimer = setTimeout(nextGifImage, currentGifImages[currentGifIndex].time ?? 200);
+                $(currentGifElement).css("background", "url('" + currentGifImages[currentGifIndex].src + "') no-repeat center/100%");
+            }            
+        }
+
+        function startBackgroundGif(images, loop) {
+            permanentCurrentGifImages = images;
+            permanentCurrentGifLooping = loop;
+            permanentCurrentGifIndex = 0;
+            
+            clearTimeout(permanentCurrentGifTimer);
+            permanentCurrentGifTimer = setTimeout(nextPermanentGifImage, 200)
+        }
+
+        function nextPermanentGifImage() {
+            permanentCurrentGifIndex++;
+            if(permanentCurrentGifLooping && permanentCurrentGifIndex >= permanentCurrentGifImages.length) {
+                permanentCurrentGifIndex = 0;
+                permanentCurrentGifTimer = setTimeout(nextPermanentGifImage, 200);
+                $('.permanent-background-image').css("background", "url('" + permanentCurrentGifImages[permanentCurrentGifIndex] + "') no-repeat center/100%");
+            } else if(!permanentCurrentGifLooping && permanentCurrentGifIndex >= permanentCurrentGifImages.length) {
+                clearTimeout(permanentCurrentGifTimer);
+                permanentCurrentGifTimer = null;
+            }
+            else {
+                permanentCurrentGifTimer = setTimeout(nextPermanentGifImage, 200);
+                $('.permanent-background-image').css("background", "url('" + permanentCurrentGifImages[permanentCurrentGifIndex] + "') no-repeat center/100%");
+            }            
+        }
+
+        let collageIndex = 0;
+        let collageImages = [];
+        let collageTimer = null;
+
+        function startCollage(images) {
+            $('.collage-container').css("display", "block");
+
+            collageIndex = 0;
+
+            shuffleArray(images)
+            collageImages = images;
+
+            clearTimeout(collageTimer);
+            collageTimer = setTimeout(nextCollageImage, 250)
+        }
+
+        function nextCollageImage() {    
+            let width = $('#main').width();
+            let height = $('#main').height();
+
+            clearTimeout(collageTimer);
+
+            let hiddenImage = $('<img style="max-width: 300px; max-height: 450px;" src="' + collageImages[collageIndex] + '" />')
+            $('.hidden-collage').append(hiddenImage);
+
+            hiddenImage.on('load', () => {
+                let res = $('.hidden-collage').children().first();
+
+                let hWidth = res.width();
+                let hHeight = res.height();
+
+                let maxWidth = 300;
+                let maxHeight = 450;
+
+                let randomWidth = hWidth > maxWidth ? width - maxWidth : width - hWidth;
+                let randomHeight = hHeight > maxHeight ? height - maxHeight : height - hHeight;
+
+                let top = Math.round(Math.random() * randomHeight);
+                let left = Math.round(Math.random() * randomWidth);
+
+                let collageImage = $('<img class="collage-image" id="collage-' + collageIndex + '" style="position: absolute; top: ' + top + 'px; left: ' + left + 'px; max-width:300px; max-height: 450px;" src="' + collageImages[collageIndex] + '"></div>"')
+                $('.collage-container').append(collageImage);
+                
+                ++collageIndex;
+
+                if(collageIndex < collageImages.length) {
+                    setTimeout(nextCollageImage, 250);
+                }
+
+                let children = $('.hidden-collage').children();
+
+                for(let i = 0; i < children.length; ++i) {
+                    children[i].remove();
+                }
+            });          
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        $(document).ready(function() {
+
+            let images = [];
+            
+            poem.map((p) => 
+            {
+                if(p.images)
+                {                   
+                    for(let i = 0; i < p.images.length; ++i)
+                    {
+                        images.push(p.images[i].src);
+                    }
+                }
+            });
+
+            preloadImages(images, () => 
+            {
+                $(".main-text").typed({
+                    strings: poem.map((s) => { return s.content; }),
+                    contentType: 'html',
+                    typeSpeed: 43,
+                    startDelay: 500,
+                    backDelay: 2500,
+                    preStringTyped: function(arg) {
+                        setText(arg);
+                    }
+                });
+
+            });
+
+            //startBackgroundGif(backgroundImages, true);
+        });
+
+    </script>
+
+    <div class="hidden-loading" style="display:none">  
+        <!-- <img src="Pics/0-0.png" />
+        <img src="Pics/0-1.png" />
+        <img src="Pics/0-2.png" />
+        <img src="Pics/0-3.png" />
+        <img src="Pics/0-4.png" />
+        <img src="Pics/0-5.png" />
+        <img src="Pics/1-0.png" />
+        <img src="Pics/2-0.png" />
+        <img src="Pics/3-0.png" />
+        <img src="Pics/3-1.png" />
+        <img src="Pics/3-2.png" />
+        <img src="Pics/3-3.png" />
+        <img src="Pics/3-4.png" />
+        <img src="Pics/4-0.png" />
+        <img src="Pics/4-1.png" />
+        <img src="Pics/5-0.png" />
+        <img src="Pics/5-1.png" />
+        <img src="Pics/5-2.png" />
+        <img src="Pics/5-3.png" />
+        <img src="Pics/5-4.png" />
+        <img src="Pics/5-5.png" />
+        <img src="Pics/5-6.png" />
+        <img src="Pics/6-0.png" />
+        <img src="Pics/6-1.png" />
+        <img src="Pics/6-2.png" />
+        <img src="Pics/6-3.png" />
+        <img src="Pics/7-0.png" />
+
+        <img src="Pics/collage/00.png" />
+        <img src="Pics/collage/01.png" />
+        <img src="Pics/collage/02.png" />
+        <img src="Pics/collage/03.png" />
+        <img src="Pics/collage/04.png" />
+        <img src="Pics/collage/05.png" />
+        <img src="Pics/collage/06.png" />
+        <img src="Pics/collage/07.png" />
+        <img src="Pics/collage/08.png" />
+        <img src="Pics/collage/09.png" />
+        <img src="Pics/collage/10.png" />
+        <img src="Pics/collage/11.png" /> -->
+    </div>
+</body>
+</html>
